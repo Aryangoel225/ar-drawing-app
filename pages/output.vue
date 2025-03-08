@@ -18,6 +18,7 @@ export default {
 </script>
 
 <style>
+
 a-scene {
     width: 100vw;
     height: 100vh;
