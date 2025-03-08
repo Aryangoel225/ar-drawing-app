@@ -1,26 +1,21 @@
 <template>
-    <div>
+    <client-only>
         <a-scene embedded arjs>
-            <!-- AR Camera -->
             <a-marker preset="hiro">
-                <a-entity gltf-model="/models/sample-model.glb" scale="0.5 0.5 0.5" position="0 0 0">
-                </a-entity>
+                <a-box position="0 0.5 0" material="color: red"></a-box>
             </a-marker>
             <a-entity camera></a-entity>
         </a-scene>
-    </div>
+    </client-only>
 </template>
 
-<script>
-export default {
-    name: "ARView"
-};
+<script setup>
+definePageMeta({ ssr: false });
 </script>
 
-<style>
-
+<style scoped>
 a-scene {
-    width: 100vw;
+    width: 100%;
     height: 100vh;
 }
 </style>
