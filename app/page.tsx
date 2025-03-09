@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 
-
 const Camera: React.FC = () => {
 
   const [image, setImage] = useState<string | null>(null);
@@ -19,7 +18,7 @@ const Camera: React.FC = () => {
         const constraints = deviceId
           ? { video: { deviceId: { exact: deviceId } } }
           : { video: true };
-          
+
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         if (video) {
           video.srcObject = stream;
@@ -55,10 +54,10 @@ const Camera: React.FC = () => {
   const switchCamera = async () => {
     const devices = await navigator.mediaDevices.enumerateDevices();
     const videoDevices = devices.filter(device => device.kind === 'videoinput');
-    
-    const newDeviceId = videoDevices.find(device => device.facing === 'environment')?.deviceId 
-                        || videoDevices.find(device => device.facing === 'user')?.deviceId;
-    
+
+    const newDeviceId = videoDevices.find(device => device.label.toLowerCase().includes('back'))?.deviceId
+      || videoDevices.find(device => device.label.toLowerCase().includes('front'))?.deviceId;
+
     if (newDeviceId && newDeviceId !== currentDeviceId) {
       setCurrentDeviceId(newDeviceId);
     }
@@ -66,41 +65,58 @@ const Camera: React.FC = () => {
 
   const submitDone = async () => {
 
-    // make a request like 
-
-    const myHeaders = new Headers();
-    myHeaders.append("x-api-key", "SG_c263dff284d243e8");
-    myHeaders.append("Content-Type", "application/json");
-
-    const raw = JSON.stringify({
-      "image": "https://i.ibb.co/8nbymYTS/hunyuan-image.png",
-      "octree_resolution": 256,
-      "num_inference_steps": 30,
-      "guidance_scale": 5.5,
-      "seed": 12467,
-      "face_count": 40000,
-      "texture": false
-    });
-
     const requestOptions = {
       method: "POST",
-      headers: myHeaders,
-      body: raw
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ "image": importedImage }),
     };
 
-    // const request = await fetch("https://api.segmind.com/v1/hunyuan-3d-2", requestOptions)
+    const request = await fetch("https://sktchpd.services.dylankainth.com/image-to-3d", requestOptions)
+
+    const response = await request.json()
+
+    console.log(response?.result)
+
+    // console.log(result.data);
+    // console.log(image)
+    // const request = await fetch('https://sktchpd.services.dylankainth.com/call/shape_generation', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json'
+    //   },
+    //   body: JSON.stringify({
+    //     'data': [
+    //       'Hello!!',
+    //       {
+    //         'path': 'https://raw.githubusercontent.com/gradio-app/gradio/main/test/test_files/bus.png'
+    //       },
+    //       20,
+    //       3,
+    //       0,
+    //       '256',
+    //       true
+    //     ]
+    //   })
+    // });
 
     // const response = await request.json()
 
-    const response = {
-      "output": "https://segmind-inference-io.s3.amazonaws.com/meshes/d3265da1-a720-4fb8-8044-0e6fbadc2330.glb",
-      "outputs": 0,
-      "status": "success"
-  }
+    // console.log(response.output)
+
+    //   const response = {
+    //     "output": "https://segmind-inference-io.s3.amazonaws.com/meshes/d3265da1-a720-4fb8-8044-0e6fbadc2330.glb",
+    //     "outputs": 0,
+    //     "status": "success"
+    // }
 
     // send the user to  /output/{response.output}
 
-    window.location.href = `/output/${response.output}`
+    // wait until the response is received
+    window.location.href = `/pending?id=${response?.result}`
+
+
 
   }
 
@@ -121,7 +137,7 @@ const Camera: React.FC = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
       <h1 className="text-3xl font-semibold text-blue-600 mb-4">Take a Picture</h1>
-      
+
       {/* Camera Feed */}
       <div className="flex justify-center mb-4">
         <video
@@ -189,8 +205,11 @@ const Camera: React.FC = () => {
         onClick={submitDone}
         className="bg-green-500 text-white py-2 px-6 rounded-lg shadow-lg hover:bg-green-600 transition duration-300 mt-4"
       >
-         Submit
+        Submit
       </button>
+
+
+
 
     </div>
   );

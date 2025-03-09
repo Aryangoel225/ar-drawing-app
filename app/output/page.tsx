@@ -3,13 +3,16 @@
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Info } from "lucide-react"
-import { useRouter } from 'next/router';
+import { useSearchParams } from 'next/navigation'
 
 
 export default function Home() {
-  const router = useRouter();
-  const { url } = router.query; // Access the dynamic 'url' parameter
 
+  const searchParams = useSearchParams()
+ 
+  const url = searchParams.get('url')
+
+  console.log(url)
   
   const [modelViewerLoaded, setModelViewerLoaded] = useState(false)
 
@@ -45,7 +48,7 @@ export default function Home() {
                 auto-rotate
                 ar-scale="fixed"
                 style={{ width: "100%", height: "100%" }}
-              ></model-viewer>
+              />
             </div>
           ) : (
             <div className="w-full h-[500px] bg-gray-100 flex items-center justify-center">
@@ -59,7 +62,7 @@ export default function Home() {
           <div className="p-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
-                <h2 className="text-xl font-semibold">Rubber Duck Model</h2>
+                <h2 className="text-xl font-semibold">Model</h2>
                 <p className="text-gray-600 mt-1">Interact with the 3D model and view it in AR</p>
               </div>
 
